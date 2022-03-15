@@ -20,6 +20,8 @@ public class Main {
         try (var driver = openConnection()) {
             var requests = new Requests(driver);
             requests.getDbLabels().forEach(System.out::println);
+            requests.possibleSpreaders().forEach(System.out::println);
+            requests.possibleSpreadCounts().forEach(System.out::println);
         }
     }
 }

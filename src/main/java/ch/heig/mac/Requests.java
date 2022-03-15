@@ -35,7 +35,12 @@ public class Requests {
     }
 
     public List<Record> possibleSpreadCounts() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (pSick:Person)-[vs:VISITS]-(pl:Place)-[vh:VISITS]-(pHealthy:Person) WHERE pSick.healthstatus = \"Sick\" AND pHealthy.healthstatus = \"Healthy\" AND vh.starttime > pSick.confirmedtime AND vs.starttime > pSick.confirmedtime AND vh.starttime >= vs.starttime AND vh.endtime <= vs.endtime return pSick.name AS sickName, size(collect(pHealthy)) AS nbHealthy";
+
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 
     public List<Record> carelessPeople() {
