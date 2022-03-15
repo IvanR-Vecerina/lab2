@@ -49,7 +49,7 @@ public class Requests {
                 "WHERE s.confirmedtime < vs.starttime\n" +
                 "WITH s, size(collect(DISTINCT p.name)) AS placeCount \n" +
                 "WHERE placeCount > 10\n" +
-                "RETURN DISTINCT s.name AS sickName, placeCount AS nbPlaces ORDER BY placeCount";
+                "RETURN DISTINCT s.name AS sickName, placeCount AS nbPlaces ORDER BY placeCount DESC";
         try (var session = driver.session()) {
             var result = session.run(queue);
             return result.list();
