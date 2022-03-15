@@ -24,12 +24,12 @@ public class Requests {
     }
 
     public List<Record> possibleSpreaders() {
-        var dbVisualizationQuery = "MATCH (s:Person {healthstatus: \"Sick\"})-[vs:VISITS]->(:Place)<-[vh:VISITS]-(:Person {healthstatus: \"Healthy\"})\n" +
+        var queue = "MATCH (s:Person {healthstatus: \"Sick\"})-[vs:VISITS]->(:Place)<-[vh:VISITS]-(:Person {healthstatus: \"Healthy\"})\n" +
                 "WHERE s.confirmedtime < vs.starttime AND s.confirmedtime < vh.starttime \n" +
-                "RETURN DISTINCT s.name AS sickName ORDER BY s.name";
+                "RETURN DISTINCT s.name AS sickName";
 
         try (var session = driver.session()) {
-            var result = session.run(dbVisualizationQuery);
+            var result = session.run(queue);
             return result.list();
         }
     }
@@ -45,7 +45,15 @@ public class Requests {
     }
 
     public List<Record> carelessPeople() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (s:Person {healthstatus: \"Sick\"})-[vs:VISITS]->(p:Place)\n" +
+                "WHERE s.confirmedtime < vs.starttime\n" +
+                "WITH s, size(collect(DISTINCT p.name)) AS placeCount \n" +
+                "WHERE placeCount > 10\n" +
+                "RETURN DISTINCT s.name AS sickName, placeCount AS nbPlaces ORDER BY placeCount";
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 
     public List<Record> sociallyCareful() {
