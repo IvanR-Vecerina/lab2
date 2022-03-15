@@ -35,8 +35,9 @@ public class Requests {
     }
 
     public List<Record> possibleSpreadCounts() {
-        var queue = "MATCH (pSick:Person)-[vs:VISITS]-(pl:Place)-[vh:VISITS]-(pHealthy:Person) WHERE pSick.healthstatus = \"Sick\" AND pHealthy.healthstatus = \"Healthy\" AND vh.starttime > pSick.confirmedtime AND vs.starttime > pSick.confirmedtime AND vh.starttime >= vs.starttime AND vh.endtime <= vs.endtime return pSick.name AS sickName, size(collect(pHealthy)) AS nbHealthy";
-
+        var queue = "MATCH (pSick:Person {healthstatus: \"Sick\"})-[vs:VISITS]-(pl:Place)-[vh:VISITS]-(pHealthy:Person {healthstatus: \"Healthy\"}) \n" +
+                "WHERE vh.starttime > vs.starttime AND vs.starttime > pSick.confirmedtime\n" +
+                "RETURN pSick.name AS sickName, size(collect(DISTINCT pHealthy)) AS nbHealthy";
         try (var session = driver.session()) {
             var result = session.run(queue);
             return result.list();
