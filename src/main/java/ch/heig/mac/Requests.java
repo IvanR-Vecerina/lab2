@@ -74,11 +74,26 @@ public class Requests {
     }
 
     public List<Record> peopleToInform() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (pSick:Person {healthstatus: \"Sick\"})-[vs:VISITS]->(pl:Place)<-[vh:VISITS]-(pHealthy:Person {healthstatus: \"Healthy\"}) \n" +
+                "WHERE duration.between(apoc.coll.max([vs.starttime, vh.starttime]), apoc.coll.min([vs.endtime, vh.endtime])).seconds >= 7200\n" +
+                "RETURN pSick.name AS sickName, collect(pHealthy.name) AS peopleToInform";
+
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 
     public List<Record> setHighRisk() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (pSick:Person {healthstatus: \"Sick\"})-[vs:VISITS]->(pl:Place)<-[vh:VISITS]-(pHealthy:Person {healthstatus: \"Healthy\"}) \n" +
+                "WHERE duration.between(apoc.coll.max([vs.starttime, vh.starttime]), apoc.coll.min([vs.endtime, vh.endtime])).seconds >= 7200\n" +
+                "SET pHealthy.risk = \"high\"\n" +
+                "RETURN DISTINCT pHealthy.name AS highRiskName";
+
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 
     public List<Record> healthyCompanionsOf(String name) {

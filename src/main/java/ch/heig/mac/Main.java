@@ -24,6 +24,8 @@ public class Main {
             requests.possibleSpreaders().forEach(System.out::println);
             requests.possibleSpreadCounts().forEach(System.out::println);
             requests.sociallyCareful().forEach(System.out::println);
+            requests.peopleToInform().forEach(System.out::println);
+            requests.setHighRisk().forEach(System.out::println);
             requests.healthyCompanionsOf("Averie Owen").forEach(System.out::println);
             System.out.println(requests.topSickSite());
             requests.sickFrom(Arrays.asList("Kade Acosta", "Eric Robertson", "Gordon Bean", "Rocco Mendez", "Marie Huff", "Averie Owen")).forEach(System.out::println);
