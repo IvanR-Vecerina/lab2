@@ -82,7 +82,14 @@ public class Requests {
     }
 
     public List<Record> healthyCompanionsOf(String name) {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        Map<String, Object> params = new HashMap<>();
+        params.put("input", name);
+        var queue = "MATCH (pHealthy:Person {healthstatus: \"Healthy\"})-[:VISITS*..6]-(pSource:Person {name: $input})\n" +
+                "RETURN DISTINCT pHealthy.name AS healthyName";
+        try (var session = driver.session()) {
+            var result = session.run(queue, params);
+            return result.list();
+        }
     }
 
     public Record topSickSite() {
