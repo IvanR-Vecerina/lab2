@@ -3,6 +3,8 @@ package ch.heig.mac;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 
@@ -77,6 +79,13 @@ public class Requests {
     }
 
     public List<Record> sickFrom(List<String> names) {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "WITH " + names.stream().map(name -> "\"" + name + "\"").collect(Collectors.joining(", ", "[ ", " ]")) + " AS persons\n" +
+                "UNWIND persons AS person\n" +
+                "MATCH (pSick:Person {healthstatus: \"Sick\", name: person})\n" +
+                "RETURN pSick.name AS sickName";
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 }
