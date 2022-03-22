@@ -75,7 +75,15 @@ public class Requests {
     }
 
     public Record topSickSite() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (pSick:Person {healthstatus: \"Sick\"})-[v:VISITS]-(n:Place)\n" +
+                "WHERE pSick.confirmedtime <= v.starttime\n" +
+                "RETURN n.type AS placeType, size(collect(pSick)) AS nbOfSickVisits\n" +
+                "ORDER BY nbOfSickVisits DESC\n" +
+                "LIMIT 1";
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list().get(0);
+        }
     }
 
     public List<Record> sickFrom(List<String> names) {
