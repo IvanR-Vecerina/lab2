@@ -59,7 +59,16 @@ public class Requests {
     }
 
     public List<Record> sociallyCareful() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        var queue = "MATCH (pSick:Person {healthstatus: \"Sick\"})\n" +
+                "WHERE NOT EXISTS {\n" +
+                "    (pSick)-[vs:VISITS]->(:Place {type: \"Bar\"})\n" +
+                "    WHERE pSick.confirmedtime < vs.starttime\n" +
+                "}\n" +
+                "RETURN pSick.name AS sickName";
+        try (var session = driver.session()) {
+            var result = session.run(queue);
+            return result.list();
+        }
     }
 
     public List<Record> peopleToInform() {
